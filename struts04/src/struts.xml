@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+    "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+
+	<!-- devMode true ? xml의 갱신모드에 조금 더 도움을 준다. (갱신이 잘 안되는 현상) -->
+    <constant name="struts.devMode" value="true" />
+
+    <package name="basicstruts2" extends="struts-default">
+        <action name="index">
+            <result>/index.jsp</result>
+        </action>
+    </package>
+
+	<package name="basic2" namespace="/bbs" extends="basicstruts2">
+		<action name="list" class="com.bit.action.ListAction">
+			<interceptor-ref name="params"></interceptor-ref>
+			<result>/bbs/list.jsp</result>
+		</action>
+		<action name="add" >
+			<result>/bbs/add.jsp</result>
+		</action>
+		<action name="insert" class="com.bit.action.InsertAction">
+		<!-- defaultStack이 default interceptor로 지정되어 있기 때문에
+		하나하나 다 지정하지 않아도 자동적으로 실행된다.
+		POJO (plain old java object)
+		interceptor에는 method 속성으로 실행하고 싶은 method를 실행시킬 수 있다.
+		 -->
+			<interceptor-ref name="prepare"></interceptor-ref>
+			<interceptor-ref name="modelDriven"></interceptor-ref>
+			<!-- param이 넘어오기전에 bean객체를 넘겨준다 setter통해 param을 넣어놓는다-->
+			<interceptor-ref name="params"></interceptor-ref>
+			<!-- bean객체를 가져온다 -->
+			<result type="redirectAction">list</result><!-- 이때의 list는 action의 list -->
+		</action>
+	</package>
+
+</struts>

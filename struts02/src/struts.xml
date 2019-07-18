@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+    "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<package name="pack01" namespace="/" extends="struts-default">
+		<!-- namespace는 하나의 뎁스를 의미 (/test/ex01.action) 
+			그냥 / 하나만 주면 밑으로 어떤 뎁스가 있어도 다 허용 (와일드문자)
+			ex) test/test/test/test/test/test/ex01.action 도 가능
+		-->
+		<action name="ex01" class="com.bit.action.Ex01Action">
+		<!-- result의 name에 따라 Ex01Action의 return값을 설정해주면 해당 페이지로 넘어간다 
+		return 할 수 있는 이름들은 정해져있는데 Action인터페이스에 final(상수)로 정의되어있다.
+		소문자로 정의되어있기때문에 꼭 소문자로, 정의된 name만 써야한다-->
+			<result name="success">/index.jsp</result>
+			<result name="error">/err.jsp</result>
+			<result name="input">/form.jsp</result>
+		</action>
+		<action name="ex02" class="com.bit.action.Ex02Action">
+			<result name="success">/form.jsp</result>
+		</action>
+		<action name="ex03" class="com.bit.action.Ex03Action">
+		<!-- interceptor는 숫자형은 자동으로 형변환 해준다 (상속받은 struts-default
+		 안에 클래스의 경로가 지정되어있어 interceptor가 필터링 중간에 필터가 하나 더 생기게 된다
+		 param을 처리해주는 interceptor가 말 그대로 인터셉트 하는 것
+		 before에서 한번 수행, 뷰 위임하면서 after에서 한번 더 실행
+		 before에서 값을 저장하고 위임할 때 값을 전달해 주는 것
+		 setAttribute와 getAttribute수행-->
+			<interceptor-ref name="params"></interceptor-ref>
+			<result name="success">/result.jsp</result>
+		</action>
+	</package>
+	<!-- 패키지는 여러개 만들 수 있지만 이름이 중복되면 안된다 -->
+	<package name="pack02" namespace="/next" extends="pack01">
+	<!-- pack01을 상속받았기때문에 pack01에 있는 action들을 이 namespace안에서 처리 가능하다
+	만약 action의 이름이 같으면?
+	오버라이딩 되어 next/ex01.action은 pack02의 ex01
+	그냥 ex01.action은 pack01의 ex01이 실행되게 된다. -->
+		<action name="ex01" class="com.bit.action.Ex04Action">
+			<!-- result의 name속성을 따로주지 않으면 디폴트 success -->			
+			<result name="success" type="redirectAction">
+				<param name="id">admin</param>
+				<param name="pw">1234</param>
+				<!-- redirectAction할 action의 name을 적어준다 -->
+				<param name="actionName">result</param>
+			</result>
+		</action>
+		<action name="input" class="com.bit.action.InputAction">
+			<result name="success">/input.jsp</result>
+		</action>
+		<action name="result" class="com.bit.action.ResultAction">
+			<interceptor-ref name="params"></interceptor-ref>
+			<result name="input">/input.jsp</result>
+			<!-- type을 redirect로 주면 resp.sendridirect 한 것과 같은 효과 
+			앞에 / 이게 있다면 루트 기준으로 ex01.action (pack01)
+			생략했을때는 현재패키지 namespace 기준으로 next/ex01.action (pack02)
+			-->
+			<!-- type=redirectAction은 .action이라는 확정명을 제외한 action 태그의 name,
+			동일 패키지의 action으로만 갈 수 있다. -->
+			<result name="success">/result.jsp</result>
+		</action>
+	</package>
+</struts>
